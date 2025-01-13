@@ -11,6 +11,7 @@ import com.ctre.phoenix6.Utils;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.hal.communication.NIRioStatus;
 import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
@@ -40,12 +41,14 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
-    camera = new PhotonCamera("testCamera");
+    camera = new PhotonCamera("Arducam_OV9782_USB_Camera");
     drivetrain = m_robotContainer.drivetrain;
+    vision = new Vision();
   }
 
   @Override
   public void robotPeriodic() {
+    
     CommandScheduler.getInstance().run();
 
     /*
@@ -57,6 +60,8 @@ public class Robot extends TimedRobot {
      * of how to use vision should be tuned per-robot and to the team's specification.
      */
     
+
+     
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
        // Correct pose estimate with vision measurements
        if (vision != null) {
@@ -70,6 +75,8 @@ public class Robot extends TimedRobot {
                     drivetrain.addVisionMeasurement(
                             est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
                 });
+        }else{
+         System.out.println("no vision :(");
         }
   }
 
