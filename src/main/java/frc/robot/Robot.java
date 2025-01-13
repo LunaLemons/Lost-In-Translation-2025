@@ -5,6 +5,9 @@
 package frc.robot;
 
 import org.photonvision.PhotonCamera;
+
+import java.util.concurrent.Flow.Publisher;
+
 import org.photonvision.*;
 
 import com.ctre.phoenix6.Utils;
@@ -20,6 +23,9 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -38,12 +44,19 @@ public class Robot extends TimedRobot {
   private final boolean kUseLimelight = false;
   private Vision vision;
   private CommandSwerveDrivetrain drivetrain;
+  StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault()
+                            .getStructTopic("MyPose", Pose2d.struct).publish();
+
 
   public Robot() {
     m_robotContainer = new RobotContainer();
     camera = new PhotonCamera("Arducam_OV9782_USB_Camera");
     drivetrain = m_robotContainer.drivetrain;
     vision = new Vision();
+
+  
+
+  
   }
 
   @Override
@@ -67,16 +80,25 @@ public class Robot extends TimedRobot {
        if (vision != null) {
 
         var visionEst = vision.getEstimatedGlobalPose();
+        System.out.println("uwu");
         visionEst.ifPresent(
                 est -> {
                     // Change our trust in the measurement based on the tags we can see
                     var estStdDevs = vision.getEstimationStdDevs();
+                    System.out.println(estStdDevs);
 
                     drivetrain.addVisionMeasurement(
-                            est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+                            est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
+                            System.out.println(est.estimatedPose.toPose2d());
+
+                            publisher.set(est.estimatedPose.toPose2d());
+
                 });
+
+                
         }else{
          System.out.println("no vision :(");
+         
         }
   }
 
