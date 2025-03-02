@@ -30,7 +30,10 @@
  import edu.wpi.first.math.VecBuilder;
  import edu.wpi.first.math.geometry.Pose2d;
  import edu.wpi.first.math.geometry.Rotation2d;
- import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
  import edu.wpi.first.math.numbers.N3;
  import edu.wpi.first.wpilibj.smartdashboard.Field2d;
  import java.util.List;
@@ -73,13 +76,32 @@
              cameraProp.setFPS(15);
              cameraProp.setAvgLatencyMs(50);
              cameraProp.setLatencyStdDevMs(15);
+
+             Translation3d robotToCameraTrl = new Translation3d(0.1, 0, 0.5);
+            // and pitched 15 degrees up.
+            Rotation3d robotToCameraRot = new Rotation3d(0, Math.toRadians(-15), 0);
+            Transform3d robotToCamera = new Transform3d(robotToCameraTrl, robotToCameraRot);
+
+            // Add this camera to the vision system simulation with the given robot-to-camera transform.
              // Create a PhotonCameraSim which will update the linked PhotonCamera's values with visible
              // targets.
              cameraSim = new PhotonCameraSim(camera, cameraProp);
              // Add the simulated camera to view the targets on this simulated field.
              visionSim.addCamera(cameraSim, kRobotToCam);
+             visionSim.adjustCamera(cameraSim, robotToCamera);
+
  
              cameraSim.enableDrawWireframe(true);
+
+             // Enable the raw and processed streams. These are enabled by default.
+            cameraSim.enableRawStream(true);
+            cameraSim.enableProcessedStream(true);
+            visionSim.getDebugField();
+
+
+            // Enable drawing a wireframe visualization of the field to the camera streams.
+            // This is extremely resource-intensive and is disabled by default.
+
          }
      }
  

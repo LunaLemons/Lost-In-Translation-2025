@@ -23,6 +23,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
@@ -33,30 +34,56 @@ import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.RobotContainer;
+import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.ConfigurationFailedException;
+import au.grapplerobotics.CanBridge;
+import edu.wpi.first.cameraserver.CameraServer;
+
+
 
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-
   private final RobotContainer m_robotContainer;
   private final PhotonCamera camera;
 
   private final boolean kUseLimelight = false;
   private Vision vision;
   private CommandSwerveDrivetrain drivetrain;
+
+  private LaserCan lc;
+
+
   StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault()
                             .getStructTopic("MyPose", Pose2d.struct).publish();
 
 
   public Robot() {
+    CanBridge.runTCP();
     m_robotContainer = new RobotContainer();
     camera = new PhotonCamera("Arducam_OV9782_USB_Camera");
     drivetrain = m_robotContainer.drivetrain;
+    CameraServer.startAutomaticCapture();
     vision = new Vision();
+    PortForwarder.add(5800, "wobot.local", 2005);
+
 
   
 
   
+  }
+
+  @Override
+  public void robotInit() {
+    lc = new LaserCan(19);
+    // Optionally initialise the settings of the LaserCAN, if you haven't already done so in GrappleHook
+    try {
+      lc.setRangingMode(LaserCan.RangingMode.SHORT);
+      lc.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 16, 16));
+      lc.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+    } catch (ConfigurationFailedException e) {
+      System.out.println("Configuration failed! " + e);
+    }
   }
 
   @Override
@@ -80,18 +107,13 @@ public class Robot extends TimedRobot {
        if (vision != null) {
 
         var visionEst = vision.getEstimatedGlobalPose();
-        System.out.println("uwu");
         visionEst.ifPresent(
                 est -> {
                     // Change our trust in the measurement based on the tags we can see
                     var estStdDevs = vision.getEstimationStdDevs();
-                    System.out.println(estStdDevs);
-
                     drivetrain.addVisionMeasurement(
                             est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
-                            System.out.println(est.estimatedPose.toPose2d());
-
-                            publisher.set(est.estimatedPose.toPose2d());
+                            //publisher.set(est.estimatedPose.toPose2d());
 
                 });
 
@@ -103,7 +125,9 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -113,6 +137,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
@@ -128,6 +153,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

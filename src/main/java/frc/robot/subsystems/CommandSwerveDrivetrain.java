@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -15,6 +16,7 @@ import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -25,8 +27,20 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
+import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.apriltag.AprilTag;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
+
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -44,16 +58,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
 
+    private final SwerveRequest.FieldCentric m_driveRequest = new SwerveRequest.FieldCentric();
+
     /** Swerve request to apply during field-centric path following */
     private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds = new SwerveRequest.ApplyFieldSpeeds();
     private final PIDController m_pathXController = new PIDController(10, 0, 0);
     private final PIDController m_pathYController = new PIDController(10, 0, 0);
     private final PIDController m_pathThetaController = new PIDController(7, 0, 0);
 
+
     /* Swerve requests to apply during SysId characterization */
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
+
+    private List<Pose2d> ApriltagPose2d;
+    private List<Pose2d> OffsetPose2dPoints;
+
+
+
 
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
@@ -135,6 +158,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
+
+        ApriltagPose2d = new ArrayList<>();
+        for (var tag : tags) {
+            ApriltagPose2d.add(tag.pose.toPose2d());
+        }
+
+        //OffsetPose2dPoints = new ArrayList<>();
+        //for (var tag : ApriltagPose2d) {
+        //    OffsetPose2dPoints.add.Pose2d(
+        //        tag.getX(),
+        //        tag.getX(),
+        //        tag.getX()
+        //
+        //    );
+        //    
+        //}
+
     }
 
     /**
@@ -154,6 +194,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SwerveDrivetrainConstants drivetrainConstants,
         double odometryUpdateFrequency,
         SwerveModuleConstants<?, ?, ?>... modules
+
     ) {
         super(drivetrainConstants, odometryUpdateFrequency, modules);
         if (Utils.isSimulation()) {
@@ -315,4 +356,46 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
+
+    PIDController xController = new PIDController(10, 0, 0);
+    PIDController yController = new PIDController(10, 0, 0);
+    PIDController thetaController = new PIDController(7.5, 0, 0);
+
+    public Command autoAlign() {
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        
+        return run(() -> {
+            Pose2d reference = getTarget();
+            var pose = getState().Pose;
+            var xSpeed = xController.calculate(pose.getX(), reference.getX());
+            var ySpeed = yController.calculate(pose.getY(), reference.getY());
+            var rotationalSpeed = thetaController.calculate(pose.getRotation().getRadians(), reference.getRotation().getRadians());
+            setControl(
+            m_driveRequest.withVelocityX(-xSpeed)
+                .withVelocityY(-ySpeed)
+                .withRotationalRate(-rotationalSpeed)
+        );
+        });
+    }
+
+    public static final AprilTagFieldLayout kTagLayout =
+                 AprilTagFields.kDefaultField.loadAprilTagLayoutField();
+    
+    public static final List<AprilTag> tags = kTagLayout.getTags();
+
+    StructPublisher<Pose2d> aprilpublisher = NetworkTableInstance.getDefault()
+                            .getStructTopic("april", Pose2d.struct).publish();
+
+
+    public Pose2d getTarget(){
+
+        Pose2d nearestApriltag = getState().Pose.nearest(ApriltagPose2d);
+        aprilpublisher.set(nearestApriltag);
+        
+        return nearestApriltag;
+    }
+
+        
 }
+
+    
