@@ -10,14 +10,19 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import choreo.util.ChoreoAllianceFlipUtil;
+
 
 import choreo.Choreo.TrajectoryLogger;
 import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -27,6 +32,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
@@ -40,6 +46,8 @@ import java.util.List;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
+
+import static frc.robot.Constants.*;
 
 
 /**
@@ -73,7 +81,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
 
     private List<Pose2d> ApriltagPose2d;
-    private List<Pose2d> OffsetPose2dPoints;
+    private List<Pose3d> OffsetPose3dPoints;
+    private final boolean flip = false;
+
+
 
 
 
@@ -159,23 +170,53 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             startSimThread();
         }
 
-        ApriltagPose2d = new ArrayList<>();
+        OffsetPose3dPoints = new ArrayList<>();
+        double sideOffset = 0.32 / 2;
         for (var tag : tags) {
-            ApriltagPose2d.add(tag.pose.toPose2d());
+            Pose3d mappedPose = PoseUtil.mapPose(tag.pose);
+            Rotation3d rotation = mappedPose.getRotation();
+            double baseAngle = rotation.getAngle(),
+                cos = Math.cos(baseAngle),
+                sin = Math.sin(baseAngle);
+            double xOffset = sideOffset * sin, yOffset = sideOffset * cos;
+
+            for (Pose3d poseuwu :
+                      new Pose3d[] {
+                        new Pose3d(
+                            mappedPose.getX() + xOffset,
+                            mappedPose.getY() - yOffset,
+                            mappedPose.getZ(),
+                            rotation.rotateBy(new Rotation3d(0, 0, Math.PI))),
+                        new Pose3d(
+                            mappedPose.getX() - xOffset,
+                            mappedPose.getY() + yOffset,
+                            mappedPose.getZ(),
+                            rotation.rotateBy(new Rotation3d(0, 0, Math.PI)))                    
+                      }) {
+                        OffsetPose3dPoints.add(poseuwu);
+                      }
+
+            
+            
         }
 
-        //OffsetPose2dPoints = new ArrayList<>();
-        //for (var tag : ApriltagPose2d) {
-        //    OffsetPose2dPoints.add.Pose2d(
-        //        tag.getX(),
-        //        tag.getX(),
-        //        tag.getX()
-        //
-        //    );
-        //    
-        //}
+        ApriltagPose2d = new ArrayList<>();
+        for (var tag : OffsetPose3dPoints) {
+            ApriltagPose2d.add(tag.toPose2d());
+        }
 
     }
+
+    public final class PoseUtil {
+        public static Pose3d mapPose(Pose3d pose) {
+        double angle = pose.getRotation().getAngle();
+        return new Pose3d(
+            pose.getX() + Math.cos(angle) * Constants.ROBOT_X / 2000.0,
+            pose.getY() + Math.sin(angle) * Constants.ROBOT_Y / 2000.0,
+            0.0,
+            pose.getRotation());
+    }
+}
 
     /**
      * Constructs a CTRE SwerveDrivetrain using the specified constants.
@@ -240,7 +281,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * @return AutoFactory for this drivetrain
      */
     public AutoFactory createAutoFactory() {
-        return createAutoFactory((sample, isStart) -> {});
+        return createAutoFactory((ihatejacky, isStart) -> {});
     }
 
     /**
@@ -259,6 +300,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             this,
             trajLogger
         );
+
     }
 
     /**
@@ -357,23 +399,38 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
-    PIDController xController = new PIDController(10, 0, 0);
-    PIDController yController = new PIDController(10, 0, 0);
-    PIDController thetaController = new PIDController(7.5, 0, 0);
+    PIDController xController = new PIDController(2, 0, 0.2);
+    PIDController yController = new PIDController(2, 0, 0.2);
+    PIDController thetaController = new PIDController(2, 0, 0.5);
 
     public Command autoAlign() {
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        //thetaController.setTolerance(0.02);
         
         return run(() -> {
             Pose2d reference = getTarget();
             var pose = getState().Pose;
             var xSpeed = xController.calculate(pose.getX(), reference.getX());
             var ySpeed = yController.calculate(pose.getY(), reference.getY());
-            var rotationalSpeed = thetaController.calculate(pose.getRotation().getRadians(), reference.getRotation().getRadians());
+            var rotationalSpeed = thetaController.calculate(pose.getRotation().getRadians(), ((reference.getRotation().getRadians())));
+
+            xSpeed = MathUtil.clamp(xSpeed, -1.5, 1.5);
+            ySpeed = MathUtil.clamp(ySpeed, -1.5, 1.5);
+            rotationalSpeed = MathUtil.clamp(rotationalSpeed, -1.5, 1.5);
+
+            //if (Math.abs(reference.getX() - pose.getX()) < 0.05) xSpeed = 0;
+            //if (Math.abs(reference.getY() - pose.getY()) < 0.05) ySpeed = 0;
+            //if (Math.abs((reference.getRotation().getRadians()) - pose.getRotation().getRadians()) < 0.02) 
+            // rotationalSpeed = 0;
+
+            if (thetaController.atSetpoint()) {
+                rotationalSpeed = 0;
+            }
+
             setControl(
             m_driveRequest.withVelocityX(-xSpeed)
                 .withVelocityY(-ySpeed)
-                .withRotationalRate(-rotationalSpeed)
+                .withRotationalRate(rotationalSpeed)
         );
         });
     }

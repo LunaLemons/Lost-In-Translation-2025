@@ -13,7 +13,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR1
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -38,11 +38,22 @@
  import edu.wpi.first.math.util.Units;
  
  public class Constants {
-     public static class Vision {
-         public static final String kCameraName = "Arducam_OV9782_USB_Camera";
+
+        /** Robot length, mm */
+        public static final double ROBOT_X = 408;
+        /** Robot width, mm */
+        public static final double ROBOT_Y = 808;
+
+
+        public static class Vision {
+         public static final String kCameraName = "Arducam_OV9782_USB_Camera (1)";
          // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
          public static final Transform3d kRobotToCam =
                  new Transform3d(new Translation3d(0.2875, 0.021, 0.25), new Rotation3d(0, 0, 0));
+        
+
+        public static final Transform3d kRobotToCam2 =
+                 new Transform3d(new Translation3d(0.310, 0.208, 0.175), new Rotation3d(0, 0, 0));
  
          // The layout of the AprilTags on the field
          public static final AprilTagFieldLayout kTagLayout =
@@ -52,5 +63,7 @@
          // (Fake values. Experiment and determine estimation noise on an actual robot.)
          public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
          public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+
+         
      }
     }

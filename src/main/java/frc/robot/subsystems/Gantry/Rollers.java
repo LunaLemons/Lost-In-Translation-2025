@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import com.revrobotics.*;
 import com.revrobotics.spark.*;
 
+import frc.robot.subsystems.Gantry.blinkin;
 
 // import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,7 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Rollers extends SubsystemBase{
     
     final TalonFX m_Roller = new TalonFX(16,"*");
-    final Spark blinkin = new Spark(0);
+    //final Spark blinkin = new Spark(2);
     // create a Motion Magic Velocity request, voltage output
     final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(0);
     final MotionMagicExpoVoltage m_requestP = new MotionMagicExpoVoltage(0);
@@ -42,9 +43,14 @@ public class Rollers extends SubsystemBase{
     //private Rev2mDistanceSensor distOnBoard;
     
     public boolean sensor = true;
+
+    // unessicary revision
+
+
     private LaserCan lc;
 
-    // set target position to 100 rotations
+    
+    //blinkin blinkininstance = blinkin.getInstance();
 
 
     public Rollers(){
@@ -67,15 +73,8 @@ public class Rollers extends SubsystemBase{
         motionMagicConfigs.MotionMagicJerk = 8000; // Target jerk of 4000 rps/s/s (0.1 seconds)
 
         m_Roller.getConfigurator().apply(talonFXConfigs);
-        lc = new LaserCan(19);
+        lc = new LaserCan(19);        
         
-
-
-        
-
-        
-        
-
     }
 
     public Command roller(Double value){
@@ -118,34 +117,35 @@ public class Rollers extends SubsystemBase{
     public void periodic() {
         LaserCan.Measurement measurement = lc.getMeasurement();
         if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
+            System.out.println("lasercan happi :D");
         } else {
             System.out.println("lasercan sad :(");
         }
         //System.out.println(measurement.distance_mm);
         //System.out.println(sensor);
 
-        if (sensor == false) {
-           if (measurement.distance_mm > 20) {
+        // unessicary revision
+            if (sensor == false) {
+                if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
+                if (measurement.distance_mm > 20) {
 
-            blinkin.set(0.25);
-            sensor = false;
-        
-           } else {
+                //blinkininstance.lights(0.25);
+                sensor = false;
+            
+            } else {
 
-            blinkin.set(0.05);
+                //blinkininstance.lights(0.05);
 
-            m_Roller.setControl(m_request.withVelocity(0));
-
-
-           }
-             
-    
+                m_Roller.setControl(m_request.withVelocity(0));
             }
+                }
+                }
+
         }
 
     @Override
     public void simulationPeriodic() {
-
+        
     }
 
     

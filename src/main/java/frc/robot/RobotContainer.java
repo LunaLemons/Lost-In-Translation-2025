@@ -75,7 +75,10 @@ public class RobotContainer {
         autoFactory = drivetrain.createAutoFactory();
         autoRoutines = new AutoRoutines(autoFactory);
 
-        autoChooser.addRoutine("lineyippee", autoRoutines::lineyippee);
+        autoChooser.addRoutine("test1coral", autoRoutines::test1coral);
+        autoChooser.addRoutine("line-yippee", autoRoutines::lineyippee);
+        
+
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
@@ -111,9 +114,10 @@ public class RobotContainer {
 
         // Elevator Setpoints
         codrivercontrol.povUp().whileTrue(elevator.Setpoints(250));
-        codrivercontrol.povLeft().whileTrue(elevator.Setpoints(119));
+        codrivercontrol.povLeft().whileTrue(elevator.Setpoints(124));
         codrivercontrol.povRight().whileTrue(elevator.Setpoints(100));
 
+        Command L1 = elevator.Setpoints(18);
 
         codrivercontrol.povDown().whileTrue(elevator.Setpoints(18));
 
@@ -132,6 +136,8 @@ public class RobotContainer {
         
         codrivercontrol.leftTrigger().whileTrue(rollers.roller(-2.0));
         codrivercontrol.rightTrigger().whileTrue(rollers.roller(-20.0));
+        codrivercontrol.start().whileTrue(rollers.roller(2.0));
+
 
 
         // yeah this doesn't either
@@ -145,7 +151,7 @@ public class RobotContainer {
         codrivercontrol.a().and(codrivercontrol.b()).whileTrue(algaeRollers.algaeSpin(0.0));
 
         codrivercontrol.x().whileTrue(algaeHinge.Setpoints(50));
-        codrivercontrol.y().whileTrue(algaeHinge.Setpoints(40));
+        codrivercontrol.y().whileTrue(algaeHinge.Setpoints(100));
 
         drivercontrol.a().whileTrue(algaeHinge.Setpoints(5));
         drivercontrol.b().whileTrue(algaeHinge.Setpoints(140));

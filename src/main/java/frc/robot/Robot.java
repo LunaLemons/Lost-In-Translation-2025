@@ -46,9 +46,13 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private final RobotContainer m_robotContainer;
   private final PhotonCamera camera;
+  private final PhotonCamera camera2;
+
 
   private final boolean kUseLimelight = false;
   private Vision vision;
+  private Vision vision2;
+
   private CommandSwerveDrivetrain drivetrain;
 
   private LaserCan lc;
@@ -61,10 +65,14 @@ public class Robot extends TimedRobot {
   public Robot() {
     CanBridge.runTCP();
     m_robotContainer = new RobotContainer();
-    camera = new PhotonCamera("Arducam_OV9782_USB_Camera");
+    camera = new PhotonCamera("Arducam_OV9782_USB_Camera (1)");
+    camera2 = new PhotonCamera("Arducam_OV9782_USB_Camera");
+
     drivetrain = m_robotContainer.drivetrain;
     CameraServer.startAutomaticCapture();
     vision = new Vision();
+    vision2 = new Vision();
+
     PortForwarder.add(5800, "wobot.local", 2005);
 
 
@@ -76,6 +84,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     lc = new LaserCan(19);
+
     // Optionally initialise the settings of the LaserCAN, if you haven't already done so in GrappleHook
     try {
       lc.setRangingMode(LaserCan.RangingMode.SHORT);
@@ -113,7 +122,7 @@ public class Robot extends TimedRobot {
                     var estStdDevs = vision.getEstimationStdDevs();
                     drivetrain.addVisionMeasurement(
                             est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
-                            //publisher.set(est.estimatedPose.toPose2d());
+                            publisher.set(est.estimatedPose.toPose2d());
 
                 });
 
@@ -122,6 +131,27 @@ public class Robot extends TimedRobot {
          System.out.println("no vision :(");
          
         }
+
+      
+
+        if (vision2 != null) {
+        
+          var visionEst2 = vision2.getEstimatedGlobalPose();
+          visionEst2.ifPresent(
+                  est -> {
+                      // Change our trust in the measurement based on the tags we can see
+                      var estStdDevs = vision2.getEstimationStdDevs();
+                      drivetrain.addVisionMeasurement(
+                              est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
+                              publisher.set(est.estimatedPose.toPose2d());
+        
+                });
+  
+                  
+          }else{
+           System.out.println("no vision :(");
+           
+          }
   }
 
   @Override
