@@ -180,6 +180,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 sin = Math.sin(baseAngle);
             double xOffset = sideOffset * sin, yOffset = sideOffset * cos;
 
+            //i don't actually think this is ever used but like idrc
             for (Pose3d poseuwu :
                       new Pose3d[] {
                         new Pose3d(
@@ -206,6 +207,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
 
     }
+
+    // i should probably figure out what this actually does
+    // TODO: figure out what the code is
 
     public final class PoseUtil {
         public static Pose3d mapPose(Pose3d pose) {
@@ -291,6 +295,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * @param trajLogger Logger for the trajectory
      * @return AutoFactory for this drivetrain
      */
+
+     // Note "useAllianceFlipping", try not to slam the robot into a wall at max speed again
     public AutoFactory createAutoFactory(TrajectoryLogger<SwerveSample> trajLogger) {
         return new AutoFactory(
             () -> getState().Pose,
@@ -340,6 +346,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 .withWheelForceFeedforwardsY(sample.moduleForcesY())
         );
     }
+
+    // ACTUALLY RUN THIS BEFORE COMP !!!!!
+    // -will definitely forget
 
     /**
      * Runs the SysId Quasistatic test in the given direction for the routine
@@ -399,13 +408,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
+    // This PID needs tuning - not sigma
     PIDController xController = new PIDController(2, 0, 0.2);
     PIDController yController = new PIDController(2, 0, 0.2);
     PIDController thetaController = new PIDController(2, 0, 0.5);
 
     public Command autoAlign() {
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
-        //thetaController.setTolerance(0.02);
+
+        // Break glass (in emergency) if vibrating:
+        // thetaController.setTolerance(0.02);
         
         return run(() -> {
             Pose2d reference = getTarget();
@@ -418,6 +430,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             ySpeed = MathUtil.clamp(ySpeed, -1.5, 1.5);
             rotationalSpeed = MathUtil.clamp(rotationalSpeed, -1.5, 1.5);
 
+            // This was a really sketchy fix for a now actually solved problem - preserved for history's sake.
             //if (Math.abs(reference.getX() - pose.getX()) < 0.05) xSpeed = 0;
             //if (Math.abs(reference.getY() - pose.getY()) < 0.05) ySpeed = 0;
             //if (Math.abs((reference.getRotation().getRadians()) - pose.getRotation().getRadians()) < 0.02) 
@@ -445,6 +458,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 
     public Pose2d getTarget(){
+
+        // This *works* but isn't ideal, as it can't differentiate different tag types
+        // Make sure to remember to add filtering before comp :3
+        // i.e. Make an intake tag list and a coral tag list
 
         Pose2d nearestApriltag = getState().Pose.nearest(ApriltagPose2d);
         aprilpublisher.set(nearestApriltag);

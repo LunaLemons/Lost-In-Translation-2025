@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
+// This should really be improved, as our telemetry is mid at best, but advantagekit is effort, and sleeping isn't.
+
 public class Telemetry {
     private final double MaxSpeed;
 

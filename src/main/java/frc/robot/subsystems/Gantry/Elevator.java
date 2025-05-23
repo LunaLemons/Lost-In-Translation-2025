@@ -20,7 +20,7 @@ public class Elevator extends SubsystemBase{
 
     // set target position to 100 rotations
 
-    public int elevatorHeight = 0;
+    public double elevatorHeight = 0.0;
 
 
     public Elevator(){
@@ -51,13 +51,13 @@ public class Elevator extends SubsystemBase{
 
     }
 
-    public Command Setpoints(int value){
+    public Command Setpoints(double value){
 
         elevatorHeight = value;
         return run(() -> m_Elevator.setControl(m_request.withPosition(Units.degreesToRotations(value)*-60)));
     }
 
-    public int getElevatorHeight() {
+    public double getElevatorHeight() {
         return elevatorHeight;
     }
 

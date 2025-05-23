@@ -30,6 +30,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 
+// We don't have and likely will never have a limelight, but i can't be bothered reading this
+// and i can't remember if my vision implementation depends on it or not, so i guess it's staying
+
 public class LimelightHelpers {
 
     private static final Map<String, DoubleArrayEntry> doubleArrayEntries = new ConcurrentHashMap<>();

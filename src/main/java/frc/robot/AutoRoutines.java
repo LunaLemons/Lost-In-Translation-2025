@@ -52,20 +52,25 @@ public class AutoRoutines {
 
         )
     );
-
-    test1coral.atTime("L1").onTrue(elevator.Setpoints(20));
+    
+    // i feel as though there must be a better way to do this
+    test1coral.atTime("L1").onTrue(elevator.Setpoints(20.0));
     test1coral.atTime("L1").onTrue(hinge.Setpoints(-135));
     test1coral.atTime("L1.1").onTrue(rollers.roller(-40.0));
     
-    test1coral.atTime("Reset").onTrue(elevator.Setpoints(124));
+    test1coral.atTime("Reset").onTrue(elevator.Setpoints(123.5));
     test1coral.atTime("Reset").onTrue(hinge.Setpoints(-30));
-    test1coral.atTime("Reset").onTrue(rollers.roller(-3.0));
+    test1coral.atTime("Reset").onTrue(rollers.roller(-2.0));
 
     (test1coral.done()).onTrue(Commands.sequence(
-    Commands.waitSeconds(4),    
+
+    // alternatively, use thread.sleep(4)
+    // (this is a very funny joke please laugh)
+    Commands.waitSeconds(4), 
+      
     test2coral.cmd()));
 
-    test2coral.atTime("LiftScore2").onTrue(elevator.Setpoints(20));
+    test2coral.atTime("LiftScore2").onTrue(elevator.Setpoints(20.0));
     test2coral.atTime("LiftScore2").onTrue(hinge.Setpoints(-135));
     test2coral.atTime("RollerScore2").onTrue(rollers.roller(-20.0));
 

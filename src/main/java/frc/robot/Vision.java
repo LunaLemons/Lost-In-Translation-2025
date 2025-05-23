@@ -47,6 +47,10 @@ import edu.wpi.first.math.numbers.N1;
  import org.photonvision.simulation.VisionSystemSim;
  import org.photonvision.targeting.PhotonTrackedTarget;
  
+ // This vision implementation is just the entire photonvision docs slammed into one file
+ // Most of it is completely redundant or non-functional, but the actual vision works so until it doesn't we're fine
+
+
  public class Vision {
      private final PhotonCamera camera;
      private final PhotonPoseEstimator photonEstimator;

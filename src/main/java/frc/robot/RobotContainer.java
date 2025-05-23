@@ -113,13 +113,13 @@ public class RobotContainer {
         //joystick.x().whileTrue(climber.Setpoints(-90));
 
         // Elevator Setpoints
-        codrivercontrol.povUp().whileTrue(elevator.Setpoints(250));
-        codrivercontrol.povLeft().whileTrue(elevator.Setpoints(124));
-        codrivercontrol.povRight().whileTrue(elevator.Setpoints(100));
+        codrivercontrol.povUp().whileTrue(elevator.Setpoints(250.0));
+        codrivercontrol.povLeft().whileTrue(elevator.Setpoints(123.5));
+        codrivercontrol.povRight().whileTrue(elevator.Setpoints(100.0));
 
         Command L1 = elevator.Setpoints(18);
 
-        codrivercontrol.povDown().whileTrue(elevator.Setpoints(18));
+        codrivercontrol.povDown().whileTrue(elevator.Setpoints(18.0));
 
         // Intake Angle
         // codrivercontrol.leftBumper().whileTrue(hinge.Setpoints(50));
@@ -140,7 +140,7 @@ public class RobotContainer {
 
 
 
-        // yeah this doesn't either
+        // what if i meow for you?
         codrivercontrol.leftTrigger().and(codrivercontrol.rightTrigger()).whileTrue(rollers.roller(0.0));
     
 
@@ -184,3 +184,23 @@ public class RobotContainer {
     }
     
 }
+/*
+⠀⢸⠂⠀⠀⠀⠘⣧⠀⠀⣟⠛⠲⢤⡀⠀⠀⣰⠏⠀⠀⠀⠀⠀⢹⡀
+⠀⡿⠀⠀⠀⠀⠀⠈⢷⡀⢻⡀⠀⠀⠙⢦⣰⠏⠀⠀⠀⠀⠀⠀⢸⠀
+⠀⡇⠀⠀⠀⠀⠀⠀⢀⣻⠞⠛⠀⠀⠀⠀⠻⠀⠀⠀⠀⠀⠀⠀⢸⠀
+⠀⡇⠀⠀⠀⠀⠀⠀⠛⠓⠒⠓⠓⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀
+⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⠀
+⠀⢿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⠀⠀⢀⡟⠀
+⠀⠘⣇⠀⠘⣿⠋⢹⠛⣿⡇⠀⠀⠀⠀⣿⣿⡇⠀⢳⠉⠀⣠⡾⠁⠀
+⣦⣤⣽⣆⢀⡇⠀⢸⡇⣾⡇⠀⠀⠀⠀⣿⣿⡷⠀⢸⡇⠐⠛⠛⣿⠀
+⠹⣦⠀⠀⠸⡇⠀⠸⣿⡿⠁⢀⡀⠀⠀⠿⠿⠃⠀⢸⠇⠀⢀⡾⠁⠀
+⠀⠈⡿⢠⢶⣡⡄⠀⠀⠀⠀⠉⠁⠀⠀⠀⠀⠀⣴⣧⠆⠀⢻⡄⠀⠀
+⠀⢸⠃⠀⠘⠉⠀⠀⠀⠠⣄⡴⠲⠶⠴⠃⠀⠀⠀⠉⡀⠀⠀⢻⡄⠀
+⠀⠘⠒⠒⠻⢦⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣤⠞⠛⠒⠛⠋⠁⠀
+⠀⠀⠀⠀⠀⠀⠸⣟⠓⠒⠂⠀⠀⠀⠀⠀⠈⢷⡀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠙⣦⠀⠀⠀⠀⠀⠀⠀⠀⠈⢷⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⣼⣃⡀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣆⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠉⣹⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡆⠀⠀⠀⠀⠀
+written by riley (wow)
+ */

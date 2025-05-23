@@ -46,8 +46,10 @@
 
 
         public static class Vision {
+         // please remember to change this before comp (meow)
          public static final String kCameraName = "Arducam_OV9782_USB_Camera (1)";
-         // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
+         
+         // measurements courtesy of Abel, of questionable accuracy
          public static final Transform3d kRobotToCam =
                  new Transform3d(new Translation3d(0.2875, 0.021, 0.25), new Rotation3d(0, 0, 0));
         
