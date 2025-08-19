@@ -60,8 +60,8 @@ import edu.wpi.first.math.numbers.N1;
      private PhotonCameraSim cameraSim;
      private VisionSystemSim visionSim;
  
-     public Vision() {
-         camera = new PhotonCamera(kCameraName);
+     public Vision(String cameraname) {
+         camera = new PhotonCamera(cameraname);
  
          photonEstimator =
                  new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, kRobotToCam);

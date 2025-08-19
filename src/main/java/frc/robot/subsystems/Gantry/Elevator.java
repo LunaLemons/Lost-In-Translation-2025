@@ -57,8 +57,14 @@ public class Elevator extends SubsystemBase{
         return run(() -> m_Elevator.setControl(m_request.withPosition(Units.degreesToRotations(value)*-60)));
     }
 
-    public double getElevatorHeight() {
-        return elevatorHeight;
+    public double[] getElevatorHeight() {
+
+        double height[] = new double[2];
+        var rotorPosSignal = m_Elevator.getRotorPosition();
+        height[1] = ((rotorPosSignal.getValueAsDouble()*360)/-60);
+        height[0] = elevatorHeight;
+
+        return height;
     }
 
 

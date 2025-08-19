@@ -10,25 +10,23 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.*;
 
-import au.grapplerobotics.LaserCan;
-import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
-
 import java.util.concurrent.TimeUnit;
 
 import org.dyn4j.collision.narrowphase.FallbackCondition;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 import com.revrobotics.*;
 import com.revrobotics.spark.*;
 
-
+import au.grapplerobotics.LaserCan;
 // import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Rollers extends SubsystemBase{
+public class RollersStatic extends SubsystemBase{
     
     final TalonFX m_Roller = new TalonFX(16,"*");
     //final Spark blinkin = new Spark(2);
@@ -41,12 +39,15 @@ public class Rollers extends SubsystemBase{
     //private Rev2mDistanceSensor distOnBoard;
     
     public boolean sensor = true;
-    private LaserCan lc;
+    public double setting = 0.0;
     //private Spark blinkin;
     // set target position to 100 rotations
+    DigitalInput m_staticintake = new DigitalInput(0);
+    DigitalInput m_endeffector2 = new DigitalInput(2);
 
 
-    public Rollers(){
+
+    public RollersStatic(){
 
         // in init function
         var talonFXConfigs = new TalonFXConfiguration();
@@ -66,21 +67,21 @@ public class Rollers extends SubsystemBase{
         motionMagicConfigs.MotionMagicJerk = 8000; // Target jerk of 4000 rps/s/s (0.1 seconds)
 
         m_Roller.getConfigurator().apply(talonFXConfigs);
-        lc = new LaserCan(19);
+          // Initializes a DigitalInput on DIO 0
+        
         //final Spark blinkin = new Spark(2);
         
         
     }
 
-    public Command roller(Double value){
-        LaserCan.Measurement measurement = lc.getMeasurement();
-        
+    public Command roller(Double value){        
+        setting = value;
 
+        /* 
         if (value < 0) {
             if (value > -15) {
                 System.out.println("not error");
-                if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
-                    if (measurement.distance_mm > 20) { // If sensor false
+                    if (m_staticintake.get() == true) { // If sensor false
                         sensor = false;
                         return run(() -> m_Roller.setControl(m_request.withVelocity(value)));
                         
@@ -94,35 +95,14 @@ public class Rollers extends SubsystemBase{
                 return run(() -> m_Roller.setControl(m_request.withVelocity(value)));
                 
             }
-
-
-            
-
-
-
-        } else {
-            System.out.println("error");
+                */
             return run(() -> m_Roller.setControl(m_request.withVelocity(value)));
-        }
- 
-        // this doesn't work
     }
 
     @Override
     public void periodic() {
-        LaserCan.Measurement measurement = lc.getMeasurement();
-        if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
-        } else {
-            //System.out.println("lasercan sad :(");
-            //System.out.println(measurement.distance_mm);
-            //System.out.println(sensor);
-        }
-        //System.out.println(measurement.distance_mm);
-        //System.out.println(sensor);
-
-        if (sensor == false) {
-            if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
-            if (measurement.distance_mm > 20) {
+        /* 
+           if (m_staticintake.get() == true) {
 
             //blinkin.set(0.25);
             sensor = false;
@@ -130,12 +110,17 @@ public class Rollers extends SubsystemBase{
            } else {
 
             //blinkin.set(0.05);
-
+            if (setting > -7.0) {
             m_Roller.setControl(m_request.withVelocity(0));
            }
-            }
-            }
         }
+        */
+        if (m_endeffector2.get() == false) {
+            m_Roller.setControl(m_request.withVelocity(0));
+            
+        }
+    }
+                    
 
     @Override
     public void simulationPeriodic() {

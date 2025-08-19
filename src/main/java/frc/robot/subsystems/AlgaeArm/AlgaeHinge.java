@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class AlgaeHinge extends SubsystemBase{
 
-    final TalonFX m_AlgaeHinge = new TalonFX(17,"*");
+    final TalonFX m_AlgaeHinge = new TalonFX(17,"");
     // create a Motion Magic Expo request, voltage output
     final MotionMagicExpoVoltage m_request = new MotionMagicExpoVoltage(0);
 

@@ -180,7 +180,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 sin = Math.sin(baseAngle);
             double xOffset = sideOffset * sin, yOffset = sideOffset * cos;
 
-            //i don't actually think this is ever used but like idrc
+            //Remember to modify to include apriltag categories and positional offset :3
             for (Pose3d poseuwu :
                       new Pose3d[] {
                         new Pose3d(

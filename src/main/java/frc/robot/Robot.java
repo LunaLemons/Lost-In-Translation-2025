@@ -47,11 +47,15 @@ public class Robot extends TimedRobot {
   private final RobotContainer m_robotContainer;
   private final PhotonCamera camera;
   private final PhotonCamera camera2;
+  private final PhotonCamera camera3;
+  private final PhotonCamera camera4;
 
 
   private final boolean kUseLimelight = false;
   private Vision vision;
   private Vision vision2;
+  private Vision vision3;
+  private Vision vision4;
 
   private CommandSwerveDrivetrain drivetrain;
 
@@ -67,18 +71,24 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     camera = new PhotonCamera("Arducam_OV9782_USB_Camera (1)");
     camera2 = new PhotonCamera("Arducam_OV9782_USB_Camera");
+    camera3 = new PhotonCamera("Arducam_OV9782_USB_Camera (meow)");
+    camera4 = new PhotonCamera("Arducam_OV9782_USB_Camera (rawr)");
+
+    String cameraname = "Arducam_OV9782_USB_Camera (1)";
+    String camera2name = "Arducam_OV9782_USB_Camera";
+    String camera3name = "Arducam_OV9782_USB_Camera (meow)";
+    String camera4name = "Arducam_OV9782_USB_Camera (rawr)";
 
     drivetrain = m_robotContainer.drivetrain;
     CameraServer.startAutomaticCapture();
-    vision = new Vision();
-    vision2 = new Vision();
+    vision = new Vision(cameraname);
+    vision2 = new Vision(camera2name);
+    vision3 = new Vision(camera3name);
+    vision4 = new Vision(camera4name);
 
     PortForwarder.add(5800, "wobot.local", 2005);
+    PortForwarder.add(5801, "lobot.local", 2006);
 
-
-  
-
-  
   }
 
   @Override
@@ -114,12 +124,13 @@ public class Robot extends TimedRobot {
                     drivetrain.addVisionMeasurement(
                             est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
                             publisher.set(est.estimatedPose.toPose2d());
+                            System.out.println("vision (alpha) nominal :3");
 
                 });
 
                 
         }else{
-         System.out.println("no vision :(");
+         System.out.println("vision (alpha) offline :(");
          
         }
 
@@ -135,14 +146,55 @@ public class Robot extends TimedRobot {
                       drivetrain.addVisionMeasurement(
                               est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
                               publisher.set(est.estimatedPose.toPose2d());
+                              System.out.println("vision (beta) nominal :3");
         
                 });
   
                   
           }else{
-           System.out.println("no vision :(");
+           System.out.println("vision (beta) offline :(");
            
           }
+
+          if (vision3 != null) {
+        
+            var visionEst3 = vision3.getEstimatedGlobalPose();
+            visionEst3.ifPresent(
+                    est -> {
+                        // Change our trust in the measurement based on the tags we can see
+                        var estStdDevs = vision3.getEstimationStdDevs();
+                        drivetrain.addVisionMeasurement(
+                                est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
+                                publisher.set(est.estimatedPose.toPose2d());
+                                System.out.println("vision (delta) nominal :3");
+          
+                  });
+    
+                    
+            }else{
+             System.out.println("vision (delta) offline :(");
+             
+            }
+
+            if (vision4 != null) {
+        
+              var visionEst4 = vision4.getEstimatedGlobalPose();
+              visionEst4.ifPresent(
+                      est -> {
+                          // Change our trust in the measurement based on the tags we can see
+                          var estStdDevs = vision4.getEstimationStdDevs();
+                          drivetrain.addVisionMeasurement(
+                                  est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
+                                  publisher.set(est.estimatedPose.toPose2d());
+                                  System.out.println("vision (omega) nominal :3");
+            
+                    });
+      
+                      
+              }else{
+               System.out.println("vision (omega) offline :(");
+               
+              }
   }
 
   @Override

@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class AlgaeRollers extends SubsystemBase{
 
-    final TalonFX m_AlgaeSpin = new TalonFX(19, "*");
+    final TalonFX m_AlgaeSpin = new TalonFX(19, "");
     // create a Motion Magic Velocity request, voltage output
     final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(0);
 

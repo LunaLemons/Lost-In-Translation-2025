@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Gantry.Elevator;
 import frc.robot.subsystems.Gantry.Hinge;
-import frc.robot.subsystems.Gantry.Rollers;
+import frc.robot.subsystems.Gantry.RollersStatic;
 
 
 
@@ -40,7 +40,7 @@ public class AutoRoutines {
 
         final Elevator elevator = new Elevator();
         final Hinge hinge = new Hinge();
-        final Rollers rollers = new Rollers();
+        final RollersStatic rollers = new RollersStatic();
 
 
 
