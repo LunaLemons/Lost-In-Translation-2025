@@ -79,7 +79,7 @@ public class RobotContainer {
 
     public RobotContainer() {
         autoFactory = drivetrain.createAutoFactory();
-        autoRoutines = new AutoRoutines(autoFactory);
+        autoRoutines = new AutoRoutines(autoFactory, elevator, hinge, rollersStatic, rollersEndEffector);
 
         autoChooser.addRoutine("test1coral", autoRoutines::test1coral);
         autoChooser.addRoutine("line-yippee", autoRoutines::lineyippee);
@@ -164,8 +164,8 @@ public class RobotContainer {
 
         //Intake Inputs
         codrivercontrol.povDown().whileTrue(elevator.Setpoints(0.0));
-        codrivercontrol.povDown().whileTrue(hinge.Setpoints(0));
-        codrivercontrol.povDown().onTrue(new InstantCommand(() -> hinge.setTargetAngle(0), hinge));
+        codrivercontrol.povDown().whileTrue(hinge.Setpoints(-3));
+        codrivercontrol.povDown().onTrue(new InstantCommand(() -> hinge.setTargetAngle(-3), hinge));
 
 
         codrivercontrol.a().whileTrue(hinge.Setpoints(20));
@@ -175,8 +175,10 @@ public class RobotContainer {
 
 
         codrivercontrol.povDown().whileTrue(rollersStatic.roller(-6.0));
+        codrivercontrol.povDown().whileTrue(rollersEndEffector.rollerendeffector(-7.0));
+
         codrivercontrol.rightTrigger().whileTrue(rollersEndEffector.rollerendeffector(-7.0));
-        // codrivercontrol.rightTrigger().whileTrue(rollersStatic.roller(-7.0));
+        codrivercontrol.rightTrigger().whileTrue(rollersStatic.roller(-7.0));
 
 
         // Intake Angle

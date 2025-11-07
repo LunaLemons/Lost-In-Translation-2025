@@ -43,7 +43,7 @@ public class RollersStatic extends SubsystemBase{
     //private Spark blinkin;
     // set target position to 100 rotations
     DigitalInput m_staticintake = new DigitalInput(0);
-    DigitalInput m_endeffector2 = new DigitalInput(2);
+    DigitalInput m_endeffector2 = new DigitalInput(3);
 
 
 
@@ -95,7 +95,7 @@ public class RollersStatic extends SubsystemBase{
                 return run(() -> m_Roller.setControl(m_request.withVelocity(value)));
                 
             }
-                */
+            */
             return run(() -> m_Roller.setControl(m_request.withVelocity(value)));
     }
 
@@ -115,10 +115,12 @@ public class RollersStatic extends SubsystemBase{
            }
         }
         */
+        
         if (m_endeffector2.get() == false) {
             m_Roller.setControl(m_request.withVelocity(0));
             
         }
+        
     }
                     
 

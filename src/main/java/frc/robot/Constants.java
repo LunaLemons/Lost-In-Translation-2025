@@ -50,21 +50,20 @@
          public static final String kCameraName = "Arducam_OV9782_USB_Camera (1)";
          
          // measurements courtesy of Abel, of questionable accuracy
-         public static final Transform3d kRobotToCam =
-                 new Transform3d(new Translation3d(0.2875, 0.021, 0.25), new Rotation3d(0, 0, 0));
+         //public static final Transform3d kRobotToCam =
+         //        new Transform3d(new Translation3d(0.2875, 0.021, 0.25), new Rotation3d(0, 0, 0));
         
 
-        public static final Transform3d kRobotToCam2 =
-                 new Transform3d(new Translation3d(0.310, 0.208, 0.175), new Rotation3d(0, 0, 0));
+        //public static final Transform3d kRobotToCam2 =
+        //         new Transform3d(new Translation3d(0.310, 0.208, 0.175), new Rotation3d(0, 0, 0));
  
          // The layout of the AprilTags on the field
          public static final AprilTagFieldLayout kTagLayout =
                  AprilTagFields.kDefaultField.loadAprilTagLayoutField();
  
          // The standard deviations of our vision estimated poses, which affect correction rate
-         // (Fake values. Experiment and determine estimation noise on an actual robot.)
-         public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
-         public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+         public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(0.5, 0.5, 0.3);
+         public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 0.3);
 
          
      }

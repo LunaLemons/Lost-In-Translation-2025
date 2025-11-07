@@ -15,6 +15,7 @@ import com.ctre.phoenix6.Utils;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.hal.communication.NIRioStatus;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
@@ -38,6 +39,17 @@ import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.numbers.N1;
+
+
+
+
+
+
 
 
 
@@ -57,6 +69,19 @@ public class Robot extends TimedRobot {
   private Vision vision3;
   private Vision vision4;
 
+  public static final Transform3d kRobotToCam =
+  new Transform3d(new Translation3d(-0.296516, -0.103341, 0.2075), new Rotation3d(0, 0, 2.5307));
+
+
+  public static final Transform3d kRobotToCam2 =
+  new Transform3d(new Translation3d(-0.296516, 0.103341, 0.2075), new Rotation3d(0, 0, -2.5307));
+
+  public static final Transform3d kRobotToCam3 =
+  new Transform3d(new Translation3d(0.115302, 0.29571, 0.303), new Rotation3d(0, 0, -0.3491));
+
+
+  public static final Transform3d kRobotToCam4 =
+  new Transform3d(new Translation3d(0.115170, -0.296294, 0.303), new Rotation3d(0, 0, 0.2618));
   private CommandSwerveDrivetrain drivetrain;
 
   private LaserCan lc;
@@ -64,30 +89,43 @@ public class Robot extends TimedRobot {
 
   StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault()
                             .getStructTopic("MyPose", Pose2d.struct).publish();
+  StructPublisher<Pose2d> publisher2 = NetworkTableInstance.getDefault()
+                            .getStructTopic("MyPose2", Pose2d.struct).publish();
+  StructPublisher<Pose2d> publisher3 = NetworkTableInstance.getDefault()
+                            .getStructTopic("MyPose3", Pose2d.struct).publish();
+  StructPublisher<Pose2d> publisher4 = NetworkTableInstance.getDefault()
+                            .getStructTopic("MyPose4", Pose2d.struct).publish();
+
 
 
   public Robot() {
     CanBridge.runTCP();
     m_robotContainer = new RobotContainer();
-    camera = new PhotonCamera("Arducam_OV9782_USB_Camera (1)");
-    camera2 = new PhotonCamera("Arducam_OV9782_USB_Camera");
-    camera3 = new PhotonCamera("Arducam_OV9782_USB_Camera (meow)");
-    camera4 = new PhotonCamera("Arducam_OV9782_USB_Camera (rawr)");
+    camera = new PhotonCamera("uwu");
+    camera2 = new PhotonCamera("rawr");
+    camera3 = new PhotonCamera("Arducam_OV9782_USB_Camera (1)");
+    camera4 = new PhotonCamera("Arducam_OV9782_USB_Camera");
+    //alpha
+    String cameraname = "uwu";
 
-    String cameraname = "Arducam_OV9782_USB_Camera (1)";
-    String camera2name = "Arducam_OV9782_USB_Camera";
-    String camera3name = "Arducam_OV9782_USB_Camera (meow)";
-    String camera4name = "Arducam_OV9782_USB_Camera (rawr)";
+    //beta
+    String camera2name = "rawr";
+
+    //delta
+    String camera3name = "Arducam_OV9782_USB_Camera (1)";
+
+    //omega
+    String camera4name = "Arducam_OV9782_USB_Camera";
 
     drivetrain = m_robotContainer.drivetrain;
     CameraServer.startAutomaticCapture();
-    vision = new Vision(cameraname);
-    vision2 = new Vision(camera2name);
-    vision3 = new Vision(camera3name);
-    vision4 = new Vision(camera4name);
+    vision = new Vision(cameraname, kRobotToCam);
+    vision2 = new Vision(camera2name, kRobotToCam2);
+    vision3 = new Vision(camera3name, kRobotToCam3);
+    vision4 = new Vision(camera4name, kRobotToCam4);
 
     PortForwarder.add(5800, "wobot.local", 2005);
-    PortForwarder.add(5801, "lobot.local", 2006);
+    PortForwarder.add(5800, "lobot.local", 2006);
 
   }
 
@@ -145,7 +183,7 @@ public class Robot extends TimedRobot {
                       var estStdDevs = vision2.getEstimationStdDevs();
                       drivetrain.addVisionMeasurement(
                               est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
-                              publisher.set(est.estimatedPose.toPose2d());
+                              publisher2.set(est.estimatedPose.toPose2d());
                               System.out.println("vision (beta) nominal :3");
         
                 });
@@ -165,7 +203,7 @@ public class Robot extends TimedRobot {
                         var estStdDevs = vision3.getEstimationStdDevs();
                         drivetrain.addVisionMeasurement(
                                 est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
-                                publisher.set(est.estimatedPose.toPose2d());
+                                publisher3.set(est.estimatedPose.toPose2d());
                                 System.out.println("vision (delta) nominal :3");
           
                   });
@@ -185,7 +223,7 @@ public class Robot extends TimedRobot {
                           var estStdDevs = vision4.getEstimationStdDevs();
                           drivetrain.addVisionMeasurement(
                                   est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
-                                  publisher.set(est.estimatedPose.toPose2d());
+                                  publisher4.set(est.estimatedPose.toPose2d());
                                   System.out.println("vision (omega) nominal :3");
             
                     });

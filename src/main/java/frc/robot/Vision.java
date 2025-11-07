@@ -60,7 +60,7 @@ import edu.wpi.first.math.numbers.N1;
      private PhotonCameraSim cameraSim;
      private VisionSystemSim visionSim;
  
-     public Vision(String cameraname) {
+     public Vision(String cameraname, Transform3d kRobotToCam) {
          camera = new PhotonCamera(cameraname);
  
          photonEstimator =

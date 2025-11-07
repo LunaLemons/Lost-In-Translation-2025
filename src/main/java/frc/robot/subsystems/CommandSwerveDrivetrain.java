@@ -208,8 +208,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     }
 
-    // i should probably figure out what this actually does
-    // TODO: figure out what the code is
+   
 
     public final class PoseUtil {
         public static Pose3d mapPose(Pose3d pose) {
@@ -441,8 +440,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             }
 
             setControl(
-            m_driveRequest.withVelocityX(-xSpeed)
-                .withVelocityY(-ySpeed)
+            m_driveRequest.withVelocityX(xSpeed)
+                .withVelocityY(ySpeed)
                 .withRotationalRate(rotationalSpeed)
         );
         });
